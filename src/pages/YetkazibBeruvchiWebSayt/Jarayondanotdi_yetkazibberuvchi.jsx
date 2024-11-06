@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useModalControl } from "../../shared/lib/use-modal-control.js";
 import { format } from 'date-fns';
 
-
-
-function Tekshiruvdanotmadi() {
+function Jarayondanotdi_yetkazibberuvchi() {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +19,7 @@ function Tekshiruvdanotmadi() {
       }
       setLoading(true)
       try {
-        const response = await fetch('https://ventum-internship-backend.bis-apps.com/api/main-laboratorian-purchase-orders/by-status/5/pagination/0', {
+        const response = await fetch('https://ventum-internship-backend.bis-apps.com/api/courier-purchase-order/under-review/pagination/0?status=6', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -50,9 +48,11 @@ function Tekshiruvdanotmadi() {
     detailsModalControl.open({ item })
   }
 
+
+
   return (
     <div>
-      <Text mt="4" color='blue' fontSize={"xl"}>Tekshiruvdan o'tmadi | Не прошел проверку </Text>
+      <Text mt="4" color='blue' fontSize={"xl"}>Jarayondan o'tdi |Прошел проверку</Text>
 
       <div>
         {loading ? (
@@ -83,10 +83,10 @@ function Tekshiruvdanotmadi() {
                     <Td>{format(new Date(item.docDueDate), 'dd.MM.yyyy')}</Td>
 
                     <Td>
-                    <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
-                      Details
-                    </Button>
-                  </Td>
+                      <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
+                        Details
+                      </Button>
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -96,12 +96,16 @@ function Tekshiruvdanotmadi() {
         )}
       </div>
 
+
       <Details modalControl={detailsModalControl} />
+
     </div>
   )
 }
 
-export default Tekshiruvdanotmadi
+export default Jarayondanotdi_yetkazibberuvchi
+
+
 
 export const Details = ({ modalControl }) => {
   const { state, close } = modalControl
@@ -128,7 +132,6 @@ export const Details = ({ modalControl }) => {
           <h2>itemCode:{item.documentLines[0].itemCode}</h2>
           <h2>itemDescription:{item.documentLines[0].itemDescription}</h2>
           <h2>quantity:{item.documentLines[0].quantity}</h2>
-          <h2>measureUnit:{item.documentLines[0].measureUnit}</h2>
 
         </div>
 

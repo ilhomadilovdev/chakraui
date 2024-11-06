@@ -339,9 +339,7 @@ export default function Sidebar() {
         </Accordion>
       </Box>
       </Card>
-      <Button colorScheme='blue'>
-        <Link to={"do"}>   navbar</Link>
-      </Button>
+   
     </div>
   )
 }

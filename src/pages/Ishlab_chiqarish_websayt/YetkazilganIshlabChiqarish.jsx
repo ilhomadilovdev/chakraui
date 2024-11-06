@@ -1,7 +1,7 @@
+import { Button, Center, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react'
+import { useModalControl } from "../../shared/lib/use-modal-control.js";
 import { format } from 'date-fns';
-import { Center, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
-
 
 function YetkazilganIshlabChiqarish() {
 
@@ -40,6 +40,15 @@ function YetkazilganIshlabChiqarish() {
 
     fetchData();
   }, [])
+
+
+
+  const detailsModalControl = useModalControl()
+
+  const handleClickDetails = (item) => {
+    detailsModalControl.open({ item })
+  }
+
   return (
     <div>
       <Text mt="4" color='blue' fontSize={"xl"}>Доставленные| Ishlab chiqarish web sayt </Text>
@@ -71,6 +80,13 @@ function YetkazilganIshlabChiqarish() {
                     <Td>{item.cardName}</Td>
                     <Td>{format(new Date(item.docDate), 'dd.MM.yyyy')}</Td>
                     <Td>{format(new Date(item.docDueDate), 'dd.MM.yyyy')}</Td>
+
+
+                    <Td>
+                      <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
+                        Details
+                      </Button>
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -79,8 +95,70 @@ function YetkazilganIshlabChiqarish() {
 
         )}
       </div>
+
+
+      <Details modalControl={detailsModalControl} />
     </div>
   )
 }
 
 export default YetkazilganIshlabChiqarish
+
+
+
+
+export const Details = ({ modalControl }) => {
+  const { state, close } = modalControl
+
+  const { item } = state
+
+  const getContent = () => {
+    if (!state.visible) {
+      return <></>
+    }
+
+    return (
+      <div className='modal_flex'>
+
+        <div>
+          <h2>cardName:{item.cardName}</h2>
+          <h2>docDate: {format(new Date(item.docDate), 'dd.MM.yyyy')}</h2>
+          <h2>docDueDate: {format(new Date(item.docDueDate), 'dd.MM.yyyy')}</h2>
+          <h2>docTotal:{item.docTotal}</h2>
+          <h2>docCurrency:{item.docCurrency}</h2>
+        </div>
+
+        <div>
+          <h2>itemCode:{item.documentLines[0].itemCode}</h2>
+          <h2>itemDescription:{item.documentLines[0].itemDescription}</h2>
+          <h2>quantity:{item.documentLines[0].quantity}</h2>
+          <h2>measureUnit:{item.documentLines[0].measureUnit}</h2>
+          <h2>unitPrice:{item.documentLines[0].unitPrice}</h2>
+          <h2>lineTotal:{item.documentLines[0].lineTotal}</h2>
+
+        </div>
+
+      </div>
+    )
+  }
+  return (
+    <>
+      <Modal isOpen={state.visible} onClose={close}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Документ</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {getContent()}
+          </ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={close}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  )
+}

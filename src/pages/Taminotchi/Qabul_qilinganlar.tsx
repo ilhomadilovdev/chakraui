@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Card, CardBody,  Center, Flex, Heading, Spinner, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
+import {
+    Button, Center,
+    Modal, ModalBody, ModalCloseButton,
+    ModalContent, ModalFooter, ModalHeader, ModalOverlay,
+    Spinner, Table, TableContainer,
+    Tbody, Td, Text, Th, Thead, Tr
+} from '@chakra-ui/react';
+import { useModalControl } from "../../shared/lib/use-modal-control.js";
 import { format } from 'date-fns';
 
 
@@ -17,11 +24,13 @@ interface PurchaseOrder {
     docCurrency: string;
     documentLines: {
         itemDescription: string;
-        itemCode:string;
-        quantity:string|number;
-        price:string|number
+        itemCode: string;
+        quantity: string | number;
+        price: string | number
     }[];
 }
+
+
 export default function Qabul_qilinganlar() {
     const [data, setData] = useState<PurchaseOrder[]>([]);
     const [docData, setDocData] = useState<PurchaseOrder[]>([])
@@ -95,6 +104,14 @@ export default function Qabul_qilinganlar() {
         handleDocument()
     }, [])
 
+
+    const detailsModalControl = useModalControl()
+
+    const handleClickDetails = (item) => {
+        detailsModalControl.open({ item })
+    }
+
+
     return (
         <div>
             <Text mt="4" color="blue" fontSize="xl">
@@ -134,6 +151,11 @@ export default function Qabul_qilinganlar() {
                                         <Td>{item.docTotal}</Td>
                                         <Td>{item.docDueDate}</Td>
                                         <Td>{item.documentLines[0].itemDescription}</Td>
+                                        <Td>
+                                            <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
+                                                Details
+                                            </Button>
+                                        </Td>
                                     </Tr>
                                 ))}
                             </Tbody>
@@ -142,100 +164,69 @@ export default function Qabul_qilinganlar() {
                 )}
             </div>
 
-            <Text mt="4" color="blue" fontSize="xl">Document</Text>
-            {docData.map((el, idx) => (
-                <Card >
-                    <Flex>
-                        <CardBody>
-                            <Stack divider={<StackDivider />} spacing='4'>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                        cardName
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                        {el.cardName}
-                                    </Text>
-                                </Box>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                        docDate
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                    {format(new Date(el.docDate), 'dd.MM.yyyy')} 
-                                    </Text>
-                                </Box>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                        docDueDate
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                    {format(new Date(el.docDueDate), 'dd.MM.yyyy')} 
-                                    </Text>
-                                </Box>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                        docTotal
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                        {el.docTotal}
-                                    </Text>
-                                </Box>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                        docCurrency
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                        {el.docCurrency}
-                                    </Text>
-                                </Box>
-                           
-                            </Stack>
-                        </CardBody>
 
 
-                        <CardBody>
-                            <Stack divider={<StackDivider />} spacing='4'>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                  itemCode
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                        {el.documentLines[idx].itemCode}
-                                    </Text>
-                                </Box>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                    itemDescription
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                        {el.documentLines[idx].itemDescription}
-                                    </Text>
-                                </Box>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                    quantity
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                        {el.documentLines[idx].quantity}
-                                    </Text>
-                                </Box>
-                                <Box>
-                                    <Heading size='xs' textTransform='uppercase'>
-                                    price
-                                    </Heading>
-                                    <Text pt='2' fontSize='sm'>
-                                        {el.documentLines[idx].price}
-                                    </Text>
-                                </Box>
-                               
-                            </Stack>
-                        </CardBody>
-                    </Flex>
-                </Card>
-            ))}
-
-
+            <Details modalControl={detailsModalControl} />
 
         </div>
     )
 }
+
+
+
+
+export const Details = ({ modalControl }) => {
+    const { state, close } = modalControl
+
+    const { item } = state
+
+    const getContent = () => {
+        if (!state.visible) {
+            return <></>
+        }
+
+        return (
+            <div className='modal_flex'>
+
+                <div>
+                    <h2>cardName:{item.cardName}</h2>
+                    <h2>docDate: {format(new Date(item.docDate), 'dd.MM.yyyy')}</h2>
+                    <h2>docDueDate: {format(new Date(item.docDueDate), 'dd.MM.yyyy')}</h2>
+                    <h2>docTotal:{item.docTotal}</h2>
+                    <h2>docCurrency:{item.docCurrency}</h2>
+                </div>
+
+                <div>
+                    <h2>itemCode:{item.documentLines[0].itemCode}</h2>
+                    <h2>itemDescription:{item.documentLines[0].itemDescription}</h2>
+                    <h2>quantity:{item.documentLines[0].quantity}</h2>
+                    <h2>price:{item.documentLines[0].unitPrice}</h2>
+                    <h2>branch:{item.branchId}</h2>
+
+                </div>
+
+            </div>
+        )
+    }
+    return (
+        <>
+            <Modal isOpen={state.visible} onClose={close}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Документ</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        {getContent()}
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button mr={3} onClick={close}>
+                            Close
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </>
+    )
+}
+

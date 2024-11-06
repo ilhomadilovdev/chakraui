@@ -1,28 +1,26 @@
-import { Button,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Table,  Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react';
+import { Button, Center, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react'
 import { useModalControl } from "../../shared/lib/use-modal-control.js";
 import { format } from 'date-fns';
 
-function Koribchiqish() {
+
+function Laborant_qaytatekshirish() {
 
 
-  const [error, setError] = useState(null);
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false)
-
-
+  const [loading, setIsloading] = useState(false);
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
-
       if (!token) {
         setError('Пользователь не авторизован');
         return;
       }
-      setLoading(true)
+      setIsloading(true)
       try {
-        const response = await fetch(`https://ventum-internship-backend.bis-apps.com/api/main-laboratorian-purchase-orders/by-status/4/pagination/0`, {
+        const response = await fetch('https://ventum-internship-backend.bis-apps.com/api/laboratorian-purchase-orders/by-status/7/pagination/0', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -33,23 +31,16 @@ function Koribchiqish() {
         }
 
         const data = await response.json();
-        setData(data.data);
-
+        setData(data?.data);
       } catch (error) {
-        toast({
-          title: 'Error',
-          description: 'An error occurred while fetching data.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
+        setError(error.message);
       } finally {
-        setLoading(false)
+        setIsloading(false)
       }
     };
 
     fetchData();
-  }, []);
+  }, [])
 
 
   const detailsModalControl = useModalControl()
@@ -61,55 +52,63 @@ function Koribchiqish() {
 
   return (
     <div>
-      <div>
-        <Text mt="2" color="green.500" fontSize="xl">Ko'rib chiqish 'Bosh laborant'</Text>
-        <Table mt="2" variant="striped">
-          {data.length > 0 && <Thead>
-            <Tr >
-              <Th>Sr.</ Th>
-              <Th>DocNum</Th>
-              <Th>cardName</Th>
-              <Th>docDate</Th>
-              <Th>docDueDate</Th>
-              <Th>itemDescription</Th>
-            </Tr>
-          </Thead>}
+      <Text mt="4" color='blue' fontSize={"xl"}>Qayta tekshiruv|Перепроверка</Text>
 
-          <Tbody >
-            {loading ? (
-              <Spinner size="md" />
-            ) : error ? (
-              <Text>Error: {error.message}</Text>
-            ) : (
-              data?.map((item, index) => (
-                <Tr key={index}>
-                  <Td>{index + 1}</Td>
-                  <Td>{item?.docNum}</Td>
-                  <Td>{item?.cardName}</Td>
-                  <Td>{format(new Date(item?.docDate), 'dd.MM.yyyy')}</Td>
-                  <Td>{format(new Date(item?.docDueDate), 'dd.MM.yyyy')}</Td>
-                  <Td>{item?.documentLines[0].itemDescription}</Td>
-                  <Td>
-                    <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
-                      Details
-                    </Button>
-                  </Td>
+      <div>
+        {loading ? (
+          <Center mt="4">
+            <Spinner size="xl" />
+          </Center>
+        ) : error ? (<Text>{error}</Text>) : (
+          <TableContainer mt="4" maxWidth={"980"}>
+            <Table variant="striped" colorScheme="teal">
+              <Thead>
+                <Tr>
+                  <Th>N</Th>
+                  <Th>docNum</Th>
+                  <Th>cardCode</Th>
+                  <Th>cardName</Th>
+                  <Th>docDate</Th>
+                  <Th>docDueDate</Th>
+                  <Th>timer</Th>
+                  <Th>Description</Th>
 
                 </Tr>
-              ))
-            )}
+              </Thead>
+              <Tbody>
+                {data.map((item, index) => (
+                  <Tr key={index} >
+                    <Td>{index + 1}</Td>
+                    <Td>{item.docNum}</Td>
+                    <Td>{item.cardCode}</Td>
+                    <Td>{item.cardName}</Td>
+                    <Td> {format(new Date(item.docDate), 'dd.MM.yyyy')}</Td>
+                    <Td> {format(new Date(item.docDueDate), 'dd.MM.yyyy')}</Td>
+                    <Td>{item.timer1}</Td>
+                    <Td>{item.documentLines[0].itemDescription}</Td>
 
-          </Tbody>
-        </Table>
+                    <Td>
+                      <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
+                        Details
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+
+        )}
       </div>
 
+
       <Details modalControl={detailsModalControl} />
+
     </div>
   )
 }
 
-export default Koribchiqish
-
+export default Laborant_qaytatekshirish
 
 
 
@@ -118,8 +117,6 @@ export const Details = ({ modalControl }) => {
   const toast = useToast()
   const [loading, setLoadingSearch] = useState(false);
   const [error, setError] = useState(null)
-
-
   const { state, close } = modalControl
 
   const { item } = state
@@ -129,8 +126,8 @@ export const Details = ({ modalControl }) => {
       return <></>
     }
 
-    //Ruxsat
-    const handleRuxsat = (params) => {
+    //Начать
+    const handleButton = (params) => {
       const fetchButton = async (params) => {
         const token = localStorage.getItem('token');
 
@@ -141,7 +138,7 @@ export const Details = ({ modalControl }) => {
 
         setLoadingSearch(true);
         try {
-          const response = await fetch(`https://ventum-internship-backend.bis-apps.com/api/main-laboratorian-purchase-orders/set-status-to-verified/${item.docEntry}/by-docnum/${item.docNum}`, {
+          const response = await fetch(`https://ventum-internship-backend.bis-apps.com/api/laboratorian-purchase-orders/started-re-checking-process/docentry/${item.docEntry}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -177,8 +174,8 @@ export const Details = ({ modalControl }) => {
       fetchButton(params)
     }
 
-    //Ruxsat emas
-    const handleRuxsatEmas = (params) => {
+    //Завершит
+    const handleButtonEnd = (params) => {
       const fetchEndButton = async (params) => {
         const token = localStorage.getItem('token');
 
@@ -189,7 +186,7 @@ export const Details = ({ modalControl }) => {
 
         setLoadingSearch(true);
         try {
-          const response = await fetch(`https://ventum-internship-backend.bis-apps.com/api/main-laboratorian-purchase-orders/set-status-rejected/${item.docEntry}/by-docnum/${item.docNum}`, {
+          const response = await fetch(`https://ventum-internship-backend.bis-apps.com/api/laboratorian-purchase-orders/from-retest-to-chief-under-review-process/${item.docEntry}/docnum/${item.docNum}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -225,55 +222,6 @@ export const Details = ({ modalControl }) => {
       fetchEndButton(params)
     }
 
-
-    //Qaytarilsin
-    const handleQaytatekshirilsin = (params) => {
-
-      const fetchEndButton = async (params) => {
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-          setError('Пользователь не авторизован');
-          return;
-        }
-
-        setLoadingSearch(true);
-        try {
-          const response = await fetch(`https://ventum-internship-backend.bis-apps.com/api/main-laboratorian-purchase-orders/set-status-re-checking/${item.docEntry}/by-docnum/${item.docNum}`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              params
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error('Ошибка при получении данных');
-          }
-
-          const data = await response.json();
-          toast({
-            title: 'Успешно! Завершить',
-            description: 'Amal muvaffaqiyatli bajarildi .',
-            status: 'success',
-            isClosable: true,
-          });
-
-
-
-        } catch (error) {
-          setError(error.message);
-        } finally {
-          setLoadingSearch(false);
-        }
-      };
-
-
-      fetchEndButton(params)
-    }
 
     return (
       <div className='modal_flex'>
@@ -293,11 +241,10 @@ export const Details = ({ modalControl }) => {
           <h2>measureUnit:{item.documentLines[0].measureUnit}</h2>
 
         </div>
-
-        <Button onClick={() => handleRuxsat(item)} mt="5" colorScheme='green' fontSize="lg" color="white"> Foydalanishga ruxsat</Button>
-        <Button onClick={() => handleRuxsatEmas(item)} mt="5" colorScheme='red' fontSize="lg" color="white">Foydalanishga ruxsat emas</Button>
-        <Button p="2" onClick={() => handleQaytatekshirilsin(item)} mt="5" colorScheme='yellow' fontSize="lg" color="white"> Qaytatekshirilsin</Button>
-
+        <Flex gap="5">
+          <Button onClick={() => handleButton(item)} mt="5" colorScheme='green' fontSize="lg" color="white">Начать</Button>
+          <Button onClick={() => handleButtonEnd(item)} mt="5" colorScheme='red' fontSize="lg" color="white">Завершить</Button>
+        </Flex>
       </div>
     )
   }

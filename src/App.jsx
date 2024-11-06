@@ -5,29 +5,29 @@ import Home from './pages/Home'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkIsauth } from './redux/Slices/authSlice'
 import Sidebar from './components/Sidebar'
-import Navbar from './components/Navbar'
+
 import Tovarlar from './pages/Tovarlar'
-import Xaridlar from './pages/Xaridlar'
+import Xaridlar from './pages/Taminotchi/Xaridlar'
 
-import Jarayondagilar from './pages/Jarayondagilar'
-import Tekshiruvdan_otdi from './pages/Tekshiruvdan_otdi'
-import Tekshiruvdan_otmadi from './pages/Tekshiruvdan_otmadi'
-import Qabul_qilinganlar from './pages/Qabul_qilinganlar'
-import Tugallangan_xaridlar from './pages/Tugallangan_xaridlar'
-import Yangi_buyurtmalar from './pages/Yangi_buyurtmalar'
+import Jarayondagilar from './pages/Taminotchi/Jarayondagilar'
+import Tekshiruvdan_otdi from './pages/Taminotchi/Tekshiruvdan_otdi'
+import Tekshiruvdan_otmadi from './pages/Taminotchi/Tekshiruvdan_otmadi'
+import Qabul_qilinganlar from './pages/Taminotchi/Qabul_qilinganlar'
+import Tugallangan_xaridlar from './pages/Taminotchi/Tugallangan_xaridlar'
+import Yangi_buyurtmalar from './pages/YetkazibBeruvchiWebSayt/Yangi_buyurtmalar'
 import Yetkazilgan from './pages/Yetkazilgan'
-import Jarayonda_yetkazibberuvchi from './pages/Jarayonda_yetkazibberuvchi'
+import Jarayonda_yetkazibberuvchi from './pages/YetkazibBeruvchiWebSayt/Jarayonda_yetkazibberuvchi'
 
-import Jarayondanotdi_yetkazibberuvchi from './pages/Jarayondanotdi_yetkazibberuvchi'
-import Jarayondanotmadi_yetkazibberuvchi from './pages/Jarayondanotmadi_yetkazibberuvchi'
-import Tugallangan_sotuvlar from './pages/Tugallangan_sotuvlar'
-import Tolovlar_money from './pages/Tolovlar_money'
-import Kiruvchi_tolov from './pages/Kiruvchi_tolov'
-import Laborant_jarayonda from './pages/Laborant_jarayonda'
-import Laborant_qaytatekshirish from './pages/Laborant_qaytatekshirish'
-import Laborant_tekshiruvdanotdi from './pages/Laborant_tekshiruvdanotdi'
+import Jarayondanotdi_yetkazibberuvchi from './pages/YetkazibBeruvchiWebSayt/Jarayondanotdi_yetkazibberuvchi'
+import Jarayondanotmadi_yetkazibberuvchi from './pages/YetkazibBeruvchiWebSayt/Jarayondanotmadi_yetkazibberuvchi'
+import Tugallangan_sotuvlar from './pages/YetkazibBeruvchiWebSayt/Tugallangan_sotuvlar'
+import Tolovlar_money from './pages/YetkazibBeruvchiWebSayt/Tolovlar_money'
+import Kiruvchi_tolov from './pages/YetkazibBeruvchiWebSayt/Kiruvchi_tolov'
+import Laborant_jarayonda from './pages/Laborant_mobil/Laborant_jarayonda'
+import Laborant_qaytatekshirish from './pages/Laborant_mobil/Laborant_qaytatekshirish'
+import Laborant_tekshiruvdanotdi from './pages/Laborant_mobil/Laborant_tekshiruvdanotdi'
 
-import Laborant_tekshiruvdanotmadi from './pages/Laborant_tekshiruvdanotmadi'
+import Laborant_tekshiruvdanotmadi from './pages/Laborant_mobil/Laborant_tekshiruvdanotmadi'
 //import LaborantDocentry from './pages/idpages/LaborantDocentry'
 import Jarayonda from './pages/Bosh_laborant/Jarayonda'
 import Koribchiqish from './pages/Bosh_laborant/Koribchiqish'
@@ -75,7 +75,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Main />} />
           <Route path='to' element={<Home />} />
-          <Route path='do' element={<Navbar />} />
+        
           <Route path='tovarlar' element={<Tovarlar />} />
           <Route path='xaridlar' element={<Xaridlar />} />
 

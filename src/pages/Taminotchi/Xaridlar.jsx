@@ -11,6 +11,8 @@ import React, { useEffect, useState } from 'react'
 import { format } from 'date-fns';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useModalControl } from "../../shared/lib/use-modal-control.js";
+
 
 
 function Xaridlar() {
@@ -219,6 +221,10 @@ function Xaridlar() {
 
 
 
+
+
+
+
   //cardcodeni oladigan funksiya
   const handleCardcord = () => {
     const fetchCardcode = async () => {
@@ -382,13 +388,19 @@ function Xaridlar() {
 
 
 
+  const detailsModalControl = useModalControl()
+
+  const handleClickDetails = (item) => {
+    detailsModalControl.open({ item })
+  }
+
   return (
     <div>
 
       <div>
         <Text fontSize="lg" color="gray"> Qidiruv</Text>
         <div>
-        <Text mt="2" fontFamily="cursive" fontSize="lg" color='yellow.400'>CardName bo'yicha qidirish</Text>
+          <Text mt="2" fontFamily="cursive" fontSize="lg" color='yellow.400'>CardName bo'yicha qidirish</Text>
           <div className='children_black'>
             <Input value={searchCardName} onChange={(e) => setSearchCardName(e.target.value)} placeholder='cardNameni qidiring' />
             <Button onClick={handleSearch} colorScheme='teal' size='md'>Qidirish</Button>
@@ -505,16 +517,22 @@ function Xaridlar() {
             ) : error ? (
               <Text>Error: {error.message}</Text>
             ) : (
-              order?.map((el, index) => (
+              order?.map((item, index) => (
                 <Tr key={index}>
                   <Td>{index + 1}</Td>
-                  <Td>{el?.docNum}</Td>
-                  <Td>{el?.cardName}</Td>
-                  <Td>{format(new Date(el?.docDate), 'dd.MM.yyyy')}</Td>
-                  <Td>{format(new Date(el?.docDueDate), 'dd.MM.yyyy')}</Td>
-                  <Td>{el?.documentLines[0].itemDescription}</Td>
-                  <Td>{el?.docTotal}</Td>
-                  <Td>{el?.branchId}</Td>
+                  <Td>{item?.docNum}</Td>
+                  <Td>{item?.cardName}</Td>
+                  <Td>{format(new Date(item?.docDate), 'dd.MM.yyyy')}</Td>
+                  <Td>{format(new Date(item?.docDueDate), 'dd.MM.yyyy')}</Td>
+                  <Td>{item?.documentLines[0].itemDescription}</Td>
+                  <Td>{item?.docTotal}</Td>
+                  <Td>{item?.branchId}</Td>
+
+                  <Td>
+                    <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
+                      Details
+                    </Button>
+                  </Td>
 
                 </Tr>
               ))
@@ -658,16 +676,75 @@ function Xaridlar() {
 
 
 
-          <Button colorScheme='red' size='lg'>Изменить статус на доставлено</Button>
+
         </Stack>
       </div>
 
 
 
-
+      <Details modalControl={detailsModalControl} />
 
     </div>
   )
 }
 
 export default Xaridlar
+
+
+
+
+export const Details = ({ modalControl }) => {
+  const { state, close } = modalControl
+
+  const { item } = state
+
+  const getContent = () => {
+    if (!state.visible) {
+      return <></>
+    }
+
+    return (
+      <>      <div className='modal_flex'>
+
+        <div>
+          <h2>cardName:{item.cardName}</h2>
+          <h2>docDate: {format(new Date(item.docDate), 'dd.MM.yyyy')}</h2>
+          <h2>docDueDate: {format(new Date(item.docDueDate), 'dd.MM.yyyy')}</h2>
+          <h2>docTotal:{item.docTotal}</h2>
+          <h2>docCurrency:{item.docCurrency}</h2>
+        </div>
+
+        <div>
+          <h2>itemCode:{item.documentLines[0].itemCode}</h2>
+          <h2>itemDescription:{item.documentLines[0].itemDescription}</h2>
+          <h2>quantity:{item.documentLines[0].quantity}</h2>
+
+        </div>
+
+      </div>
+
+        <Button mt="2" colorScheme='red' size='lg'>Изменить статус на доставлено</Button>
+      </>
+    )
+  }
+  return (
+    <>
+      <Modal isOpen={state.visible} onClose={close}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Документ</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {getContent()}
+          </ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={close}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  )
+}

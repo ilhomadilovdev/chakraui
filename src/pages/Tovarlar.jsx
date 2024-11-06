@@ -53,6 +53,8 @@ function Tovarlar() {
   const [uoMGroupEntry, setuoMGroupEntry] = useState("")
 
 
+  const [nameItem, setNameItem] = useState("")
+
 
 
 
@@ -310,7 +312,37 @@ function Tovarlar() {
   const handleEdit = (index) => {
     setIsEditing(index);
   };
+  const handleGroupCode = () => {
+    const fetcheuoGroup = async () => {
+      const token = localStorage.getItem('token');
 
+      if (!token) {
+        setError('Пользователь не авторизован');
+        return;
+      }
+      setCodeLoading(true)
+      try {
+        const response = await fetch(`https://ventum-internship-backend.bis-apps.com/api/supplier-items/search?itemName=${nameItem}&groupCode=${groupCode}&valid=${tyes}&skip=0`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Ошибка при получении данных');
+        }
+
+        const data = await response.json();
+        setCodeResults(data?.data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setCodeLoading(false);
+      }
+    };
+
+    fetcheuoGroup();
+  }
   return (
     <div>
       <Text mt="4" color="gray.800" fontWeight="700" fontSize="2xl">Qidiruv</Text>
@@ -318,8 +350,9 @@ function Tovarlar() {
       <div>
         <div className='flex_one'>
           <Input value={groupCode} onChange={(e) => setGroupCode(e.target.value)} maxW="250" placeholder='groupCode kiriting' />
+          <Input value={nameItem} onChange={(e) => setNameItem(e.target.value)} maxW="250" placeholder='ItemNameni kiriting' />
           <Input value={tyes} onChange={(e) => setTyes(e.target.value)} maxW="250" placeholder='validni kiriting' />
-          <Button colorScheme='blue' size="md" p="2">Qidirish</Button>
+          <Button onClick={handleGroupCode} colorScheme='blue' size="md" p="2">Qidirish</Button>
         </div>
 
 
@@ -327,7 +360,7 @@ function Tovarlar() {
           <>
 
             <Table variant='simple'>
-              <Thead>
+              {codeResults.length > 0 && <Thead>
                 <Tr >
                   <Th>Sr.</ Th>
                   <Th>itemCode</Th>
@@ -337,7 +370,7 @@ function Tovarlar() {
                   <Th>salesUnit</Th>
                   <Th>typeOfGoods</Th>
                 </Tr>
-              </Thead>
+              </Thead>}
               <Tbody>
                 {codeResults.map((el) => (
                   <Tr >

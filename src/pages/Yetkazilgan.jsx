@@ -45,7 +45,7 @@ export default function Yetkazilgan() {
   }, [])
   return (
     <div>
-      <Text fontSize="2xl" mt="8">Yetkazilgan</Text>
+      <Text fontSize="2xl" mt="8">Yetkazilganfff</Text>
       {loading ? (
         <Center mt="4">
           <Spinner size="xl" />

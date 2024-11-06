@@ -1,16 +1,14 @@
 import { Button, Center, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
+import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react'
 import { useModalControl } from "../../shared/lib/use-modal-control.js";
-import { format } from 'date-fns';
 
 
 
-function Sotib_olish() {
-
-    const [data, setData] = useState([]);
+function Tekshiruvdan_otdi() {
     const [loading, setLoading] = useState(false);
+    const [data, setData] = useState([]);
     const [error, setError] = useState(null)
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -22,7 +20,7 @@ function Sotib_olish() {
             }
             setLoading(true)
             try {
-                const response = await fetch('https://ventum-internship-backend.bis-apps.com/api/production-manager-order/new/pagination/0', {
+                const response = await fetch('https://ventum-internship-backend.bis-apps.com/api/supplier-purchase-orders/by-status/6/pagination/0', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -45,46 +43,48 @@ function Sotib_olish() {
     }, [])
 
 
-    
     const detailsModalControl = useModalControl()
 
     const handleClickDetails = (item) => {
         detailsModalControl.open({ item })
     }
 
-    
+
     return (
         <div>
-            <Text mt="4" color='blue' fontSize={"xl"}>Заказ на закупку | Ishlab chiqarish web sayt </Text>
+            <Text mt="4" color='blue' fontSize={"xl"}>Tekshiruvdan o'tdi</Text>
 
             <div>
                 {loading ? (
                     <Center mt="4">
                         <Spinner size="xl" />
                     </Center>
-                ) : error ? (<Text color="red">{error.message}</Text>) : (
+                ) : (
                     <TableContainer maxWidth={"980"}>
                         <Table variant="striped" colorScheme="teal">
                             <Thead>
                                 <Tr>
                                     <Th>ID</Th>
+                                    <Th>docEntry</Th>
                                     <Th>docNum</Th>
-                                    <Th>cardCode</Th>
                                     <Th>cardName</Th>
                                     <Th>docDate</Th>
+                                    <Th>docTotal</Th>
                                     <Th>docDueDate</Th>
+                                    <Th>documentLines</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {data.map((item, index) => (
                                     <Tr >
                                         <Td>{index + 1}</Td>
+                                        <Td>{item.docEntry}</Td>
                                         <Td>{item.docNum}</Td>
-                                        <Td>{item.cardCode}</Td>
                                         <Td>{item.cardName}</Td>
                                         <Td>{format(new Date(item.docDate), 'dd.MM.yyyy')}</Td>
+                                        <Td>{item.docTotal}</Td>
                                         <Td>{format(new Date(item.docDueDate), 'dd.MM.yyyy')}</Td>
-
+                                        <Td>{item.documentLines[0].itemDescription}</Td>
                                         <Td>
                                             <Button color={"white"} colorScheme='blue' onClick={() => handleClickDetails(item)}>
                                                 Details
@@ -100,15 +100,16 @@ function Sotib_olish() {
             </div>
 
 
-            <Details modalControl={detailsModalControl} />
+            <TekshiruvdanOtdiDetails modalControl={detailsModalControl} />
+
         </div>
     )
 }
 
-export default Sotib_olish
+export default Tekshiruvdan_otdi
 
 
-export const Details = ({ modalControl }) => {
+export const TekshiruvdanOtdiDetails = ({ modalControl }) => {
     const { state, close } = modalControl
 
     const { item } = state
@@ -133,9 +134,8 @@ export const Details = ({ modalControl }) => {
                     <h2>itemCode:{item.documentLines[0].itemCode}</h2>
                     <h2>itemDescription:{item.documentLines[0].itemDescription}</h2>
                     <h2>quantity:{item.documentLines[0].quantity}</h2>
-                    <h2>measureUnit:{item.documentLines[0].measureUnit}</h2>
-                    <h2>unitPrice:{item.documentLines[0].unitPrice}</h2>
-                    <h2>lineTotal:{item.documentLines[0].lineTotal}</h2>
+                    <h2>price:{item.documentLines[0].unitPrice}</h2>
+                    <h2>branch:{item.branchId}</h2>
 
                 </div>
 
@@ -154,7 +154,7 @@ export const Details = ({ modalControl }) => {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button mr={3} onClick={close}>
+                        <Button variantColor="blue" mr={3} onClick={close}>
                             Close
                         </Button>
                     </ModalFooter>
